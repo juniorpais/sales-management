@@ -5,7 +5,7 @@
 | Phase | Description | Branch | Status | Progress |
 |-------|-------------|--------|--------|----------|
 | 1 | Project Setup | `main` | ✅ Done | 100% |
-| 2 | Domain Layer | `feature/domain-layer` | ⬜ Pending | 0% |
+| 2 | Domain Layer | `feature/domain-layer` | ✅ Done | 100% |
 | 3 | Application Layer | `feature/application-layer` | ⬜ Pending | 0% |
 | 4 | Infrastructure Layer | `feature/infrastructure-layer` | ⬜ Pending | 0% |
 | 5 | API Layer | `feature/api-layer` | ⬜ Pending | 0% |
@@ -13,7 +13,7 @@
 | 7 | Tests | `feature/tests` | ⬜ Pending | 0% |
 | 8 | Documentation | `feature/documentation` | ⬜ Pending | 0% |
 
-**Overall Progress: 5% (4 / 75 tasks completed)**
+**Overall Progress: 29% (22 / 75 tasks completed)**
 
 ---
 
@@ -72,37 +72,37 @@ style:    formatting, no logic change
 
 ### Foundation
 
-- [ ] Enhance `BaseEntity` with domain event dispatch (`AddDomainEvent`)
-- [ ] Create `IDomainEvent` marker interface
-- [ ] Create `DomainException` extensions for business rule violations
+- [x] Enhance `BaseEntity` with domain event dispatch (`AddDomainEvent`)
+- [x] Create `IDomainEvent` marker interface
+- [x] Create `DomainException` extensions for business rule violations
 
 ### Sale Aggregate
 
-- [ ] `Sale` entity (SaleNumber, Date, CustomerId, CustomerName, BranchId, BranchName, IsCancelled, Items, TotalAmount)
-- [ ] `SaleItem` entity (ProductId, ProductName, Quantity, UnitPrice, Discount, TotalAmount)
-- [ ] Discount business rules inside `SaleItem`:
-  - [ ] Qty < 4 → no discount
-  - [ ] Qty 4–9 → 10% discount
-  - [ ] Qty 10–20 → 20% discount
-  - [ ] Qty > 20 → `Result.Fail("Cannot sell more than 20 identical items")`
-- [ ] `Sale.Cancel()` method → sets `IsCancelled = true`, raises `SaleCancelledEvent`
-- [ ] `Sale.CancelItem(productId)` → raises `ItemCancelledEvent`
-- [ ] `SaleValidator` (FluentValidation)
-- [ ] `SaleItemValidator` (FluentValidation)
+- [x] `Sale` entity (SaleNumber, Date, CustomerId, CustomerName, BranchId, BranchName, IsCancelled, Items, TotalAmount)
+- [x] `SaleItem` entity (ProductId, ProductName, Quantity, UnitPrice, Discount, TotalAmount)
+- [x] Discount business rules inside `SaleItem`:
+  - [x] Qty < 4 → no discount
+  - [x] Qty 4–9 → 10% discount
+  - [x] Qty 10–20 → 20% discount
+  - [x] Qty > 20 → `Result.Fail("Cannot sell more than 20 identical items")`
+- [x] `Sale.Cancel()` method → sets `IsCancelled = true`, raises `SaleCancelledEvent`
+- [x] `Sale.CancelItem(productId)` → raises `ItemCancelledEvent`
+- [x] `SaleValidator` (FluentValidation)
+- [x] `SaleItemValidator` (FluentValidation)
 
 ### Supporting Entities
 
-- [ ] `Product` entity (Title, Price, Description, Category, Image, Rating)
-- [ ] `ProductValidator` (FluentValidation)
-- [ ] `Cart` entity (UserId, Date, Items)
-- [ ] `CartItem` value object (ProductId, Quantity)
-- [ ] `CartValidator` (FluentValidation)
+- [x] `Product` entity (Title, Price, Description, Category, Image, Rating)
+- [x] `ProductValidator` (FluentValidation)
+- [x] `Cart` entity (UserId, Date, Items)
+- [x] `CartItem` value object (ProductId, Quantity)
+- [x] `CartValidator` (FluentValidation)
 
 ### Repository Interfaces
 
-- [ ] `ISaleRepository` (GetById, GetAll, Create, Update, Delete)
-- [ ] `IProductRepository`
-- [ ] `ICartRepository`
+- [x] `ISaleRepository` (GetById, GetAll, Create, Update, Delete)
+- [x] `IProductRepository`
+- [x] `ICartRepository`
 
 ---
 

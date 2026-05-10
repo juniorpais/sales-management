@@ -71,6 +71,11 @@ This section includes links to the detailed documentation for the different API 
 - [Auth API](/docs/auth-api.md)
 -->
 
+## Domain
+This section documents the domain model, aggregates, business rules, events and architectural decisions.
+
+See [Domain](/docs/domain.md)
+
 ## Project Structure
 This section describes the overall structure and organization of the project files and directories. 
 

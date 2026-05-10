@@ -1,16 +1,15 @@
 using Ambev.DeveloperEvaluation.Domain.Common;
-using Ambev.DeveloperEvaluation.Domain.Entities;
 
 namespace Ambev.DeveloperEvaluation.Domain.Events;
 
-public class UserRegisteredEvent : IDomainEvent
+public class SaleCancelledEvent : IDomainEvent
 {
-    public User User { get; }
+    public Guid SaleId { get; }
     public DateTime OccurredAt { get; }
 
-    public UserRegisteredEvent(User user)
+    public SaleCancelledEvent(Guid saleId)
     {
-        User = user;
+        SaleId = saleId;
         OccurredAt = DateTime.UtcNow;
     }
 }
