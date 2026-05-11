@@ -37,5 +37,7 @@ public interface IUserRepository
     /// <param name="id">The unique identifier of the user to delete</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if the user was deleted, false if not found</returns>
+    Task<User> UpdateAsync(User user, CancellationToken cancellationToken = default);
+    Task<(IEnumerable<User> Items, int TotalCount)> GetAllAsync(int page, int size, string? order = null, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }
