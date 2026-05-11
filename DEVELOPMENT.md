@@ -5,15 +5,17 @@
 | Phase | Description | Branch | Status | Progress |
 |-------|-------------|--------|--------|----------|
 | 1 | Project Setup | `main` | ✅ Done | 100% |
-| 2 | Domain Layer | `feature/domain-layer` | ✅ Done | 100% |
-| 3 | Application Layer | `feature/application-layer` | ⬜ Pending | 0% |
-| 4 | Infrastructure Layer | `feature/infrastructure-layer` | ⬜ Pending | 0% |
-| 5 | API Layer | `feature/api-layer` | ⬜ Pending | 0% |
-| 6 | Events | `feature/domain-events` | ⬜ Pending | 0% |
+| 2 | Database + ORM Mapping | `feature/database-orm` | ✅ Done* | 100% |
+| 3 | Data Manipulation Layer | `feature/data-manipulation` | ✅ Done* | 100% |
+| 4 | Services Layer (Rebus) | `feature/services-layer` | ⬜ Pending | 0% |
+| 5 | Business Rules | `feature/business-rules` | ✅ Done* | 100% |
+| 6 | Application Log | `feature/app-logging` | ⬜ Pending | 0% |
 | 7 | Tests | `feature/tests` | ⬜ Pending | 0% |
 | 8 | Documentation | `feature/documentation` | ⬜ Pending | 0% |
 
-**Overall Progress: 29% (22 / 75 tasks completed)**
+> *Phases 2, 3 and 5 were developed together under `feature/domain-layer` and `feature/application-layer` following a DDD-first approach. The branch names above reflect the commit segregation convention from the challenge manual.
+
+**Overall Progress: 55% (44 / 80 tasks completed)**
 
 ---
 
@@ -22,18 +24,18 @@
 ```
 main
  └── develop
-      ├── feature/domain-layer
-      ├── feature/application-layer
-      ├── feature/infrastructure-layer
-      ├── feature/api-layer
-      ├── feature/domain-events
+      ├── feature/database-orm
+      ├── feature/data-manipulation
+      ├── feature/services-layer
+      ├── feature/business-rules
+      ├── feature/app-logging
       ├── feature/tests
       └── feature/documentation
 ```
 
-> Each `feature/*` branch is created from `develop` and merged back via PR.  
-> Releases are cut from `develop` → `release/x.y.z` → merged into `main` + `develop`.  
-> Hotfixes branch from `main` → `hotfix/description` → merged into `main` + `develop`.
+> Each `feature/*` branches from `develop` and merges back via PR.
+> `develop` merges into `main` via `release/x.y.z` when ready.
+> Hotfixes branch from `main` → `hotfix/description` → merge into `main` + `develop`.
 
 ---
 
@@ -55,196 +57,138 @@ style:    formatting, no logic change
 
 **Progress: 100% (4/4)**
 
-- [x] Move template structure to repository root (`src/`, `tests/`)
-- [x] Validate solution file references
-- [x] Docker Compose baseline (PostgreSQL + app)
-- [x] `.editorconfig` and `.dockerignore` in place
+- [x] Move template structure to repository root (`src/`, `tests/`, `docs/`)
+- [x] Validate solution file and Docker Compose baseline
+- [x] `.editorconfig`, `.dockerignore`, `.gitignore` in place
+- [x] Development plan documented
 
 ---
 
-## Phase 2 — Domain Layer `feature/domain-layer`
+## Phase 2 — Database + ORM Mapping `feature/database-orm`
 
-**Progress: 0% (0/18)**
+**Progress: 100% (10/10)**
 
-> Rich domain: business rules, invariants, and validation live exclusively in the domain entities — never in handlers or controllers.  
-> Uses **FluentValidation** for entity validators.  
-> Uses **FluentResults** (`Result<T>`) as return type for all domain operations.
+> EF Core + PostgreSQL. Fluent API mapping. AutoMapper profiles.
+> MongoDB considered for document storage (logs/events).
 
-### Foundation
+- [x] `Sale` EF Core configuration (table, columns, owned collections)
+- [x] `SaleItem` EF Core configuration
+- [x] `Product` EF Core configuration with owned `Rating`
+- [x] `Cart` EF Core configuration
+- [x] `CartItem` EF Core configuration
+- [x] Register all configurations in `DefaultContext`
+- [x] `SaleRepository` with pagination + filtering + ordering
+- [x] `ProductRepository`
+- [x] `CartRepository`
+- [x] EF Core migration for all new tables
 
-- [x] Enhance `BaseEntity` with domain event dispatch (`AddDomainEvent`)
-- [x] Create `IDomainEvent` marker interface
-- [x] Create `DomainException` extensions for business rule violations
+---
 
-### Sale Aggregate
+## Phase 3 — Data Manipulation Layer `feature/data-manipulation`
 
-- [x] `Sale` entity (SaleNumber, Date, CustomerId, CustomerName, BranchId, BranchName, IsCancelled, Items, TotalAmount)
-- [x] `SaleItem` entity (ProductId, ProductName, Quantity, UnitPrice, Discount, TotalAmount)
-- [x] Discount business rules inside `SaleItem`:
+**Progress: 100% (20/20)**
+
+> MediatR (CQRS). AutoMapper profiles. FluentValidation. FluentResults.
+
+### Sales
+- [x] `CreateSaleCommand` + `CreateSaleHandler`
+- [x] `UpdateSaleCommand` + `UpdateSaleHandler`
+- [x] `CancelSaleCommand` + `CancelSaleHandler`
+- [x] `GetSaleQuery` + `GetSaleHandler`
+- [x] `GetSalesQuery` + `GetSalesHandler` (paginated)
+
+### Products
+- [x] `CreateProductCommand` + handler
+- [x] `UpdateProductCommand` + handler
+- [x] `DeleteProductCommand` + handler
+- [x] `GetProductQuery` + handler
+- [x] `GetProductsQuery` + handler (paginated + category filter)
+- [x] `GetCategoriesQuery` + handler
+
+### Carts
+- [x] `CreateCartCommand` + handler
+- [x] `UpdateCartCommand` + handler
+- [x] `DeleteCartCommand` + handler
+- [x] `GetCartQuery` + handler
+- [x] `GetCartsQuery` + handler (paginated)
+
+### Users (completing template)
+- [x] `UpdateUserCommand` + handler
+- [x] `GetUsersQuery` + handler (paginated)
+
+### Common
+- [x] `IEventPublisher` in `Common.Events`
+
+---
+
+## Phase 4 — Services Layer `feature/services-layer`
+
+**Progress: 0% (0/8)**
+
+> Rebus for event publishing. Polly for retry. Serilog structured logging.
+
+- [ ] Add Rebus package to Infrastructure project
+- [ ] `LogEventPublisher` — implements `IEventPublisher` via Serilog + Polly retry (3x exponential backoff)
+- [ ] Register `IEventPublisher` in IoC (`InfrastructureModuleInitializer`)
+- [ ] `SaleCreatedEvent` published on sale creation
+- [ ] `SaleModifiedEvent` published on sale update
+- [ ] `SaleCancelledEvent` published on sale cancellation
+- [ ] `ItemCancelledEvent` published on item cancellation
+- [ ] Validate Polly retry: log warning on each retry, error on final failure
+
+---
+
+## Phase 5 — Business Rules `feature/business-rules`
+
+**Progress: 100% (10/10)**
+
+> Rich domain: rules live exclusively in entities. FluentResults for domain operations.
+
+- [x] `IDomainEvent` + `IEventPublisher` in `Common.Events`
+- [x] `BaseEntity` with domain event dispatch (`AddDomainEvent`, `ClearDomainEvents`)
+- [x] `SaleItem` discount rules:
   - [x] Qty < 4 → no discount
   - [x] Qty 4–9 → 10% discount
   - [x] Qty 10–20 → 20% discount
-  - [x] Qty > 20 → `Result.Fail("Cannot sell more than 20 identical items")`
-- [x] `Sale.Cancel()` method → sets `IsCancelled = true`, raises `SaleCancelledEvent`
+  - [x] Qty > 20 → `Result.Fail`
+- [x] `Sale.Cancel()` → raises `SaleCancelledEvent`
 - [x] `Sale.CancelItem(productId)` → raises `ItemCancelledEvent`
-- [x] `SaleValidator` (FluentValidation)
-- [x] `SaleItemValidator` (FluentValidation)
-
-### Supporting Entities
-
-- [x] `Product` entity (Title, Price, Description, Category, Image, Rating)
-- [x] `ProductValidator` (FluentValidation)
-- [x] `Cart` entity (UserId, Date, Items)
-- [x] `CartItem` value object (ProductId, Quantity)
-- [x] `CartValidator` (FluentValidation)
-
-### Repository Interfaces
-
-- [x] `ISaleRepository` (GetById, GetAll, Create, Update, Delete)
-- [x] `IProductRepository`
-- [x] `ICartRepository`
+- [x] `SaleValidator`, `SaleItemValidator`, `ProductValidator`, `CartValidator` (FluentValidation)
+- [x] `ISaleRepository`, `IProductRepository`, `ICartRepository` interfaces
+- [x] `Rating` value object with invariant validation
 
 ---
 
-## Phase 3 — Application Layer `feature/application-layer`
+## Phase 6 — Application Log `feature/app-logging`
 
-**Progress: 0% (0/19)**
+**Progress: 0% (0/5)**
 
-> Uses **MediatR** (CQRS pattern).  
-> All handlers return `Result<T>` from **FluentResults**.  
-> **AutoMapper** profiles for Command → Entity and Entity → Result.
+> Serilog already configured in template. Add structured log entries at key points.
 
-### Infrastructure Abstractions
-
-- [ ] `IEventPublisher` interface (`PublishAsync<T>(T event)`)
-
-### Sales
-
-- [ ] `CreateSaleCommand` + `CreateSaleHandler` → returns `Result<CreateSaleResult>`
-- [ ] `UpdateSaleCommand` + `UpdateSaleHandler` → returns `Result<UpdateSaleResult>`
-- [ ] `CancelSaleCommand` + `CancelSaleHandler` → returns `Result`
-- [ ] `GetSaleQuery` + `GetSaleHandler` → returns `Result<GetSaleResult>`
-- [ ] `GetSalesQuery` + `GetSalesHandler` (paginated) → returns `Result<PaginatedList<GetSaleResult>>`
-- [ ] AutoMapper profile: `SaleMappingProfile`
-
-### Products
-
-- [ ] `CreateProductCommand` + handler
-- [ ] `UpdateProductCommand` + handler
-- [ ] `DeleteProductCommand` + handler
-- [ ] `GetProductQuery` + handler
-- [ ] `GetProductsQuery` + handler (paginated + filter by category)
-- [ ] AutoMapper profile: `ProductMappingProfile`
-
-### Carts
-
-- [ ] `CreateCartCommand` + handler
-- [ ] `UpdateCartCommand` + handler
-- [ ] `DeleteCartCommand` + handler
-- [ ] `GetCartQuery` + handler
-- [ ] `GetCartsQuery` + handler (paginated)
-- [ ] AutoMapper profile: `CartMappingProfile`
-
-### Users (complete missing operations)
-
-- [ ] `UpdateUserCommand` + handler
-- [ ] `GetUsersQuery` + handler (paginated)
-
----
-
-## Phase 4 — Infrastructure Layer `feature/infrastructure-layer`
-
-**Progress: 0% (0/13)**
-
-> EF Core + PostgreSQL.  
-> Repositories implement interfaces from Domain.  
-> Event publisher logs via `ILogger` with Polly retry policy.
-
-### EF Core Mappings
-
-- [ ] `SaleConfiguration` (Fluent API — table, columns, owned collections)
-- [ ] `SaleItemConfiguration`
-- [ ] `ProductConfiguration`
-- [ ] `CartConfiguration`
-- [ ] `CartItemConfiguration`
-- [ ] Register all configurations in `DefaultContext`
-
-### Repositories
-
-- [ ] `SaleRepository` (implements `ISaleRepository`) — with pagination + filtering + ordering
-- [ ] `ProductRepository` (implements `IProductRepository`)
-- [ ] `CartRepository` (implements `ICartRepository`)
-
-### Event Publisher
-
-- [ ] `LogEventPublisher` — implements `IEventPublisher`, logs via Serilog, Polly retry (3x exponential backoff)
-
-### Migrations
-
-- [ ] EF migration for Sales, SaleItems, Products, Carts, CartItems tables
-- [ ] Validate `docker-compose up` runs migrations on startup
-
-### IoC
-
-- [ ] Register new repositories and `IEventPublisher` in `InfrastructureModuleInitializer`
-
----
-
-## Phase 5 — API Layer `feature/api-layer`
-
-**Progress: 0% (0/10)**
-
-> All responses use the existing `ApiResponseWithData<T>` and `PaginatedResponse<T>` wrappers.  
-> Errors follow the `{ type, error, detail }` format from `general-api.md`.  
-> Supports `_page`, `_size`, `_order`, field filters, `_min*`, `_max*` query params.
-
-### Controllers
-
-- [ ] `SalesController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}
-- [ ] `ProductsController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}, GET/categories, GET/category/{category}
-- [ ] `CartsController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}
-- [ ] `UsersController` — complete with GET (paginated) and PUT/{id}
-
-### Request / Response Models
-
-- [ ] Sales: `CreateSaleRequest`, `UpdateSaleRequest`, `SaleResponse`, `SaleItemResponse`
-- [ ] Products: `CreateProductRequest`, `UpdateProductRequest`, `ProductResponse`
-- [ ] Carts: `CreateCartRequest`, `UpdateCartRequest`, `CartResponse`
-- [ ] Users: `UpdateUserRequest`
-- [ ] AutoMapper profiles for all Request → Command and Result → Response mappings
-
-### Middleware
-
-- [ ] Map `Result.Fail` reasons to appropriate HTTP status codes (400, 404, 422)
-
----
-
-## Phase 6 — Domain Events `feature/domain-events`
-
-**Progress: 0% (0/6)**
-
-- [ ] `SaleCreatedEvent` (raised on `Sale` creation)
-- [ ] `SaleModifiedEvent` (raised on `Sale` update)
-- [ ] `SaleCancelledEvent` (raised on `Sale.Cancel()`)
-- [ ] `ItemCancelledEvent` (raised on `Sale.CancelItem()`)
-- [ ] Dispatch events after handler persists aggregate (`PublishAsync` in handlers)
-- [ ] Polly retry validated: logs warning on each retry, error on final failure
+- [ ] Log `SaleCreatedEvent` with sale number, customer, total amount
+- [ ] Log `SaleModifiedEvent` with sale ID and changed fields
+- [ ] Log `SaleCancelledEvent` with sale ID and reason
+- [ ] Log `ItemCancelledEvent` with sale ID and product ID
+- [ ] Log validation errors and domain failures at Warning level
 
 ---
 
 ## Phase 7 — Tests `feature/tests`
 
-**Progress: 0% (0/5)**
+**Progress: 0% (0/8)**
 
-> xUnit + NSubstitute + Bogus + **FluentAssertions**.  
-> Pattern: Arrange / Act / Assert, one concern per test.  
+> xUnit + NSubstitute + Bogus (Faker) + FluentAssertions.
+> Pattern: Arrange / Act / Assert — one concern per test.
 > Coverage target: ≥ 80%.
 
-- [ ] Unit tests — `SaleItem` discount rules (all tiers + boundary + limit violation)
-- [ ] Unit tests — `Sale` aggregate (`Cancel`, `CancelItem`, total calculation)
-- [ ] Unit tests — handlers (CreateSale, UpdateSale, CancelSale, GetSale)
-- [ ] Integration tests setup — `WebApplicationFactory` + real PostgreSQL (Docker Compose profile)
+- [ ] Unit tests — `SaleItem` discount rules (all tiers + boundary + limit)
+- [ ] Unit tests — `Sale` aggregate (`AddItem`, `Cancel`, `CancelItem`, `TotalAmount`)
+- [ ] Unit tests — `CreateSaleHandler` (success + domain failure)
+- [ ] Unit tests — `CancelSaleHandler` (success + not found + already cancelled)
+- [ ] Integration tests setup — `WebApplicationFactory` + real PostgreSQL
 - [ ] Coverage report configured (`coverlet` + `coverage-report.sh`)
+- [ ] Postman collection with all endpoints (saved in `docs/`)
+- [ ] Manual CRUD test scenarios documented in `docs/`
 
 ---
 
@@ -252,8 +196,8 @@ style:    formatting, no logic change
 
 **Progress: 0% (0/5)**
 
-- [ ] `README.md` — complete setup, prerequisites, how to run, how to test
-- [ ] Environment variables documented (`.env.example`)
+- [ ] `README.md` complete — setup, prerequisites, how to run, how to test, env vars, endpoints
+- [ ] `.env.example` with all required environment variables
 - [ ] Docker Compose usage documented (dev + test profiles)
 - [ ] API endpoint summary table in README
-- [ ] Postman collection or `.http` file with example requests for all endpoints
+- [ ] Update `docs/domain.md` with final architecture decisions
