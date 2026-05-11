@@ -1,3 +1,4 @@
+using Ambev.DeveloperEvaluation.Common.Events;
 using Ambev.DeveloperEvaluation.Common.Validation;
 
 namespace Ambev.DeveloperEvaluation.Domain.Common;
