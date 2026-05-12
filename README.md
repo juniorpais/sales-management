@@ -246,7 +246,7 @@ Quantity-based discount tiers applied automatically per item:
 - [Carts API](docs/carts-api.md)
 - [Users API](docs/users-api.md)
 - [Auth API](docs/auth-api.md)
-- [Architecture Decision Records](docs/adr/)
+- [Architecture Decision Records](docs/adr/) — includes deployment strategy (Docker Compose → Kubernetes)
 - [API Error Reference](docs/error-reference.md)
 - [Postman Collection](docs/sales-management.postman_collection.json)
 - [Changelog](CHANGELOG.md)
