@@ -41,7 +41,9 @@ public static class RebusConfigurationExtensions
 
         services.AddRebus(configure => configure
             .Transport(t => t.UseRabbitMq(rabbitMqConnectionString, "sales-management"))
-            .Routing(r => r.TypeBased().MapAssemblyOf<IDomainEvent>("sales-management")));
+            .Routing(r => r.TypeBased().MapAssemblyOf<IDomainEvent>("sales-management"))
+            .Options(o => o.SetNumberOfWorkers(1))
+            .Options(o => o.SetMaxParallelism(1)));
 
         services.AddScoped<IEventPublisher, RebusEventPublisher>();
         services.AddScoped<LogEventPublisher>();
