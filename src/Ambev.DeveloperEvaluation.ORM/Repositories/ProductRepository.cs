@@ -1,5 +1,6 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.ORM.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories;
@@ -29,6 +30,7 @@ public class ProductRepository : IProductRepository
     {
         var query = _context.Products.AsQueryable();
         var totalCount = await query.CountAsync(cancellationToken);
+        query = query.ApplyOrdering(order);
         var items = await query.Skip((page - 1) * size).Take(size).ToListAsync(cancellationToken);
         return (items, totalCount);
     }
@@ -37,6 +39,7 @@ public class ProductRepository : IProductRepository
     {
         var query = _context.Products.Where(p => p.Category == category);
         var totalCount = await query.CountAsync(cancellationToken);
+        query = query.ApplyOrdering(order);
         var items = await query.Skip((page - 1) * size).Take(size).ToListAsync(cancellationToken);
         return (items, totalCount);
     }

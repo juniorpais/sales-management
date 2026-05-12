@@ -1,5 +1,6 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.ORM.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories;
@@ -31,6 +32,7 @@ public class CartRepository : ICartRepository
     {
         var query = _context.Carts.Include(c => c.Items).AsQueryable();
         var totalCount = await query.CountAsync(cancellationToken);
+        query = query.ApplyOrdering(order);
         var items = await query.Skip((page - 1) * size).Take(size).ToListAsync(cancellationToken);
         return (items, totalCount);
     }
