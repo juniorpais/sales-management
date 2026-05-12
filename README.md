@@ -241,7 +241,7 @@ Quantity-based discount tiers applied automatically per item:
 
 - [Domain Model & Architecture](docs/domain.md)
 - [API General Definitions](docs/general-api.md)
-- [Sales API](docs/general-api.md)
+- [Sales API](docs/sales-api.md)
 - [Products API](docs/products-api.md)
 - [Carts API](docs/carts-api.md)
 - [Users API](docs/users-api.md)
