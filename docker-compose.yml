@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   ambev.developerevaluation.webapi:
@@ -11,10 +11,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ConnectionStrings__DefaultConnection=Host=ambev.developerevaluation.database;Port=5432;Database=developer_evaluation;Username=developer;Password=ev@luAt10n
+      - ConnectionStrings__RabbitMq=amqp://developer:ev@luAt10n@ambev.developerevaluation.rabbitmq:5672
     ports:
       - "8080:8080"
     depends_on:
       - ambev.developerevaluation.database
+      - ambev.developerevaluation.rabbitmq
     restart: unless-stopped
 
   ambev.developerevaluation.database:
@@ -30,5 +32,19 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  ambev.developerevaluation.rabbitmq:
+    container_name: ambev_developer_evaluation_rabbitmq
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: developer
+      RABBITMQ_DEFAULT_PASS: ev@luAt10n
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 volumes:
   pgdata:
+  rabbitmq_data:

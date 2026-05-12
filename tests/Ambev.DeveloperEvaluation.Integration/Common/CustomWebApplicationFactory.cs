@@ -1,8 +1,11 @@
+using Ambev.DeveloperEvaluation.Common.Events;
+using Ambev.DeveloperEvaluation.IoC.Services;
 using Ambev.DeveloperEvaluation.ORM;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Ambev.DeveloperEvaluation.Integration.Common;
 
@@ -27,6 +30,20 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 )
             );
 
+            var hostedServices = services.Where(d => d.ServiceType == typeof(IHostedService)).ToList();
+            foreach (var service in hostedServices)
+            {
+                services.Remove(service);
+            }
+
+            var eventPublisherDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IEventPublisher));
+            if (eventPublisherDescriptor != null)
+                services.Remove(eventPublisherDescriptor);
+            services.AddScoped<IEventPublisher, LogEventPublisher>();
+        });
+        
+        builder.ConfigureServices(services =>
+        {
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<DefaultContext>();

@@ -102,4 +102,35 @@ public class SaleTests
 
         sale.TotalAmount.Should().Be(200m);
     }
+
+    [Fact(DisplayName = "Given sale When updating Then raises SaleModifiedEvent")]
+    public void Given_Sale_When_Updating_Then_RaisesSaleModifiedEvent()
+    {
+        var sale = SaleTestData.GenerateValidSale();
+        sale.ClearDomainEvents();
+
+        var result = sale.Update(
+            DateTime.UtcNow,
+            Guid.NewGuid(),
+            "New Customer",
+            Guid.NewGuid(),
+            "New Branch");
+
+        result.IsSuccess.Should().BeTrue();
+        sale.DomainEvents.Should().ContainSingle(e => e is SaleModifiedEvent);
+    }
+
+    [Fact(DisplayName = "Given sale with item When updating item quantity Then raises SaleModifiedEvent")]
+    public void Given_SaleWithItem_When_UpdatingItemQuantity_Then_RaisesSaleModifiedEvent()
+    {
+        var sale = SaleTestData.GenerateValidSale();
+        var productId = Guid.NewGuid();
+        sale.AddItem(productId, "Product", 2, 100m);
+        sale.ClearDomainEvents();
+
+        var result = sale.AddItem(productId, "Product", 3, 100m);
+
+        result.IsSuccess.Should().BeTrue();
+        sale.DomainEvents.Should().ContainSingle(e => e is SaleModifiedEvent);
+    }
 }
