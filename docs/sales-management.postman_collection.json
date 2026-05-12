@@ -1,0 +1,390 @@
+{
+  "info": {
+    "name": "Sales Management API",
+    "description": "Complete CRUD collection for Sales Management API — covers Auth, Users, Products, Carts and Sales endpoints with pagination, filtering and ordering examples.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john.doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"Test@1234\",\n  \"phone\": \"+5511999999999\",\n  \"status\": \"Active\",\n  \"role\": \"Customer\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"] }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Get Users (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?_page=1&_size=10&_order=username asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"],
+              "query": [
+                { "key": "_page", "value": "1" },
+                { "key": "_size", "value": "10" },
+                { "key": "_order", "value": "username asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john.doe.updated\",\n  \"email\": \"john.updated@example.com\",\n  \"phone\": \"+5511888888888\",\n  \"status\": \"Active\",\n  \"role\": \"Manager\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fjallraven Backpack\",\n  \"price\": 109.95,\n  \"description\": \"Perfect pack for everyday use\",\n  \"category\": \"bags\",\n  \"image\": \"https://example.com/image.jpg\",\n  \"ratingRate\": 3.9,\n  \"ratingCount\": 120\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/products", "host": ["{{baseUrl}}"], "path": ["api", "products"] }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/products/{{productId}}", "host": ["{{baseUrl}}"], "path": ["api", "products", "{{productId}}"] }
+          }
+        },
+        {
+          "name": "Get Products (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?_page=1&_size=10&_order=price desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [
+                { "key": "_page", "value": "1" },
+                { "key": "_size", "value": "10" },
+                { "key": "_order", "value": "price desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Products by Category (route)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/category/bags?_page=1&_size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "category", "bags"],
+              "query": [
+                { "key": "_page", "value": "1" },
+                { "key": "_size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/products/categories", "host": ["{{baseUrl}}"], "path": ["api", "products", "categories"] }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fjallraven Backpack Updated\",\n  \"price\": 99.95,\n  \"description\": \"Updated description\",\n  \"category\": \"bags\",\n  \"image\": \"https://example.com/image.jpg\",\n  \"ratingRate\": 4.2,\n  \"ratingCount\": 150\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/products/{{productId}}", "host": ["{{baseUrl}}"], "path": ["api", "products", "{{productId}}"] }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/products/{{productId}}", "host": ["{{baseUrl}}"], "path": ["api", "products", "{{productId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Carts",
+      "item": [
+        {
+          "name": "Create Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"userName\": \"John Doe\",\n  \"date\": \"2026-05-11T00:00:00Z\",\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"productName\": \"Fjallraven Backpack\",\n      \"quantity\": 2\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/carts", "host": ["{{baseUrl}}"], "path": ["api", "carts"] }
+          }
+        },
+        {
+          "name": "Get Cart by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/carts/{{cartId}}", "host": ["{{baseUrl}}"], "path": ["api", "carts", "{{cartId}}"] }
+          }
+        },
+        {
+          "name": "Get Carts (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/carts?_page=1&_size=10&_order=date desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "carts"],
+              "query": [
+                { "key": "_page", "value": "1" },
+                { "key": "_size", "value": "10" },
+                { "key": "_order", "value": "date desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Cart",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-05-12T00:00:00Z\",\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"productName\": \"Fjallraven Backpack\",\n      \"quantity\": 5\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/carts/{{cartId}}", "host": ["{{baseUrl}}"], "path": ["api", "carts", "{{cartId}}"] }
+          }
+        },
+        {
+          "name": "Delete Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/carts/{{cartId}}", "host": ["{{baseUrl}}"], "path": ["api", "carts", "{{cartId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sales",
+      "item": [
+        {
+          "name": "Create Sale (qty < 4, no discount)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"saleNumber\": \"SALE-001\",\n  \"date\": \"2026-05-11T00:00:00Z\",\n  \"customerId\": \"{{userId}}\",\n  \"customerName\": \"John Doe\",\n  \"branchId\": \"00000000-0000-0000-0000-000000000001\",\n  \"branchName\": \"Branch SP\",\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"productName\": \"Fjallraven Backpack\",\n      \"quantity\": 2,\n      \"unitPrice\": 109.95\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sales", "host": ["{{baseUrl}}"], "path": ["api", "sales"] }
+          }
+        },
+        {
+          "name": "Create Sale (qty 4-9, 10% discount)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"saleNumber\": \"SALE-002\",\n  \"date\": \"2026-05-11T00:00:00Z\",\n  \"customerId\": \"{{userId}}\",\n  \"customerName\": \"John Doe\",\n  \"branchId\": \"00000000-0000-0000-0000-000000000001\",\n  \"branchName\": \"Branch SP\",\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"productName\": \"Fjallraven Backpack\",\n      \"quantity\": 5,\n      \"unitPrice\": 109.95\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sales", "host": ["{{baseUrl}}"], "path": ["api", "sales"] }
+          }
+        },
+        {
+          "name": "Create Sale (qty 10-20, 20% discount)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"saleNumber\": \"SALE-003\",\n  \"date\": \"2026-05-11T00:00:00Z\",\n  \"customerId\": \"{{userId}}\",\n  \"customerName\": \"John Doe\",\n  \"branchId\": \"00000000-0000-0000-0000-000000000001\",\n  \"branchName\": \"Branch SP\",\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"productName\": \"Fjallraven Backpack\",\n      \"quantity\": 15,\n      \"unitPrice\": 109.95\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sales", "host": ["{{baseUrl}}"], "path": ["api", "sales"] }
+          }
+        },
+        {
+          "name": "Create Sale (qty > 20, should fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"saleNumber\": \"SALE-004\",\n  \"date\": \"2026-05-11T00:00:00Z\",\n  \"customerId\": \"{{userId}}\",\n  \"customerName\": \"John Doe\",\n  \"branchId\": \"00000000-0000-0000-0000-000000000001\",\n  \"branchName\": \"Branch SP\",\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"productName\": \"Fjallraven Backpack\",\n      \"quantity\": 21,\n      \"unitPrice\": 109.95\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sales", "host": ["{{baseUrl}}"], "path": ["api", "sales"] }
+          }
+        },
+        {
+          "name": "Get Sale by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}", "host": ["{{baseUrl}}"], "path": ["api", "sales", "{{saleId}}"] }
+          }
+        },
+        {
+          "name": "Get Sales (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/sales?_page=1&_size=10&_order=date desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sales"],
+              "query": [
+                { "key": "_page", "value": "1" },
+                { "key": "_size", "value": "10" },
+                { "key": "_order", "value": "date desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Sale",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-05-12T00:00:00Z\",\n  \"customerId\": \"{{userId}}\",\n  \"customerName\": \"John Doe Updated\",\n  \"branchId\": \"00000000-0000-0000-0000-000000000002\",\n  \"branchName\": \"Branch RJ\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}", "host": ["{{baseUrl}}"], "path": ["api", "sales", "{{saleId}}"] }
+          }
+        },
+        {
+          "name": "Cancel Sale",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}", "host": ["{{baseUrl}}"], "path": ["api", "sales", "{{saleId}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}
