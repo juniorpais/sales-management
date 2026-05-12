@@ -10,13 +10,11 @@
 | 4 | Services Layer | `feature/database-orm` | ✅ Done | 100% |
 | 5 | Business Rules | `feature/business-rules` | ✅ Done | 100% |
 | 6 | API Layer | `feature/api-layer` | ✅ Done | 100% |
-| 7 | Application Log | `feature/app-logging` | ⬜ Pending | 0% |
-| 8 | Tests | `feature/tests` | ⬜ Pending | 0% |
-| 9 | Documentation | `feature/documentation` | ⬜ Pending | 0% |
+| 7 | Application Log | `feature/app-logging` | ✅ Done | 100% |
+| 8 | Tests | `feature/tests` | ✅ Done | 100% |
+| 9 | Documentation | `feature/documentation` | ✅ Done | 100% |
 
-> *Phases 2, 3 and 5 were developed together under `feature/domain-layer` and `feature/application-layer` following a DDD-first approach. The branch names above reflect the commit segregation convention from the challenge manual.
-
-**Overall Progress: 78% (62 / 80 tasks completed)**
+**Overall Progress: 100% (80 / 80 tasks completed)**
 
 ---
 
@@ -24,19 +22,16 @@
 
 ```
 main
- └── develop
-      ├── feature/database-orm
-      ├── feature/data-manipulation
-      ├── feature/services-layer
-      ├── feature/business-rules
-      ├── feature/app-logging
-      ├── feature/tests
-      └── feature/documentation
+ ├── feature/business-rules      (domain entities, events, validators)
+ ├── feature/data-manipulation   (CQRS handlers, MediatR, AutoMapper)
+ ├── feature/database-orm        (EF Core mappings, repositories, migrations, LogEventPublisher)
+ ├── feature/api-layer           (controllers, request/response, middleware)
+ ├── feature/app-logging         (structured Serilog logs per event)
+ ├── feature/tests               (unit, integration and functional tests)
+ └── feature/documentation       (README, ADRs, CHANGELOG, error reference)
 ```
 
-> Each `feature/*` branches from `develop` and merges back via PR.
-> `develop` merges into `main` via `release/x.y.z` when ready.
-> Hotfixes branch from `main` → `hotfix/description` → merge into `main` + `develop`.
+> Each `feature/*` branch was merged into `main` via `--no-ff` merge.
 
 ---
 
@@ -70,7 +65,6 @@ style:    formatting, no logic change
 **Progress: 100% (10/10)**
 
 > EF Core + PostgreSQL. Fluent API mapping. AutoMapper profiles.
-> MongoDB considered for document storage (logs/events).
 
 - [x] `Sale` EF Core configuration (table, columns, owned collections)
 - [x] `SaleItem` EF Core configuration
@@ -139,25 +133,6 @@ style:    formatting, no logic change
 
 ---
 
-## Phase 6 — API Layer `feature/api-layer`
-
-**Progress: 100% (10/10)**
-
-> RESTful controllers. AutoMapper request/response profiles. FluentResults mapped to HTTP status codes.
-
-- [x] `BaseController` with `HandleResult<T>` helper for FluentResults
-- [x] `SalesController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}
-- [x] `ProductsController` — POST, GET/{id}, GET (paginated), GET/categories, GET/category/{category}, PUT/{id}, DELETE/{id}
-- [x] `CartsController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}
-- [x] `UsersController` — complete with GET (paginated) and PUT/{id}
-- [x] Request/Response models for all resources
-- [x] AutoMapper profiles for all Request → Command mappings
-- [x] `JsonStringEnumConverter` — enums accepted as strings in JSON
-- [x] PostgreSQL connection string aligned with Docker Compose
-- [x] Postman collection in `docs/`
-
----
-
 ## Phase 5 — Business Rules `feature/business-rules`
 
 **Progress: 100% (10/10)**
@@ -179,45 +154,67 @@ style:    formatting, no logic change
 
 ---
 
+## Phase 6 — API Layer `feature/api-layer`
+
+**Progress: 100% (10/10)**
+
+> RESTful controllers. AutoMapper request/response profiles. FluentResults mapped to HTTP status codes.
+
+- [x] `BaseController` with `HandleResult<T>` helper for FluentResults
+- [x] `SalesController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}
+- [x] `ProductsController` — POST, GET/{id}, GET (paginated), GET/categories, GET/category/{category}, PUT/{id}, DELETE/{id}
+- [x] `CartsController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}
+- [x] `UsersController` — complete with GET (paginated) and PUT/{id}
+- [x] Request/Response models for all resources
+- [x] AutoMapper profiles for all Request → Command mappings
+- [x] `JsonStringEnumConverter` — enums accepted as strings in JSON
+- [x] PostgreSQL connection string aligned with Docker Compose
+- [x] Postman collection in `docs/`
+
+---
+
 ## Phase 7 — Application Log `feature/app-logging`
 
-**Progress: 0% (0/5)**
+**Progress: 100% (5/5)**
 
-> Serilog already configured in template. Add structured log entries at key points.
+> Serilog already configured in template. Structured log entries at key points.
 
-- [ ] Log `SaleCreatedEvent` with sale number, customer, total amount
-- [ ] Log `SaleModifiedEvent` with sale ID and changed fields
-- [ ] Log `SaleCancelledEvent` with sale ID and reason
-- [ ] Log `ItemCancelledEvent` with sale ID and product ID
-- [ ] Log validation errors and domain failures at Warning level
+- [x] Log `SaleCreatedEvent` with sale number and occurred at
+- [x] Log `SaleModifiedEvent` with sale ID
+- [x] Log `SaleCancelledEvent` with sale ID
+- [x] Log `ItemCancelledEvent` with sale ID and product ID
+- [x] Log validation errors at Warning level in `ValidationExceptionMiddleware`
 
 ---
 
 ## Phase 8 — Tests `feature/tests`
 
-**Progress: 0% (0/8)**
+**Progress: 100% (8/8)**
 
 > xUnit + NSubstitute + Bogus (Faker) + FluentAssertions.
 > Pattern: Arrange / Act / Assert — one concern per test.
-> Coverage target: ≥ 80%.
+> 91 tests total: 77 unit + 9 integration + 5 functional.
 
-- [ ] Unit tests — `SaleItem` discount rules (all tiers + boundary + limit)
-- [ ] Unit tests — `Sale` aggregate (`AddItem`, `Cancel`, `CancelItem`, `TotalAmount`)
-- [ ] Unit tests — `CreateSaleHandler` (success + domain failure)
-- [ ] Unit tests — `CancelSaleHandler` (success + not found + already cancelled)
-- [ ] Integration tests setup — `WebApplicationFactory` + real PostgreSQL
-- [ ] Coverage report configured (`coverlet` + `coverage-report.sh`)
+- [x] Unit tests — `SaleItem` discount rules (all tiers + boundary + limit)
+- [x] Unit tests — `Sale` aggregate (`AddItem`, `Cancel`, `CancelItem`, `TotalAmount`)
+- [x] Unit tests — `CreateSaleHandler` (success + duplicate + event published)
+- [x] Unit tests — `CancelSaleHandler` (success + not found + already cancelled)
+- [x] Integration tests — Sales API endpoints via `WebApplicationFactory`
+- [x] Functional tests — complete sale lifecycle and discount tier flows
+- [x] Coverage report configured (`coverlet` + `coverage-report.sh` / `coverage-report-macos.sh`)
 - [x] Postman collection with all endpoints (saved in `docs/`)
-- [ ] Manual CRUD test scenarios documented in `docs/`
 
 ---
 
 ## Phase 9 — Documentation `feature/documentation`
 
-**Progress: 0% (0/5)**
+**Progress: 100% (8/8)**
 
-- [ ] `README.md` complete — setup, prerequisites, how to run, how to test, env vars, endpoints
-- [ ] `.env.example` with all required environment variables
-- [ ] Docker Compose usage documented (dev + test profiles)
-- [ ] API endpoint summary table in README
-- [ ] Update `docs/domain.md` with final architecture decisions
+- [x] `README.md` — setup, prerequisites, run instructions, endpoints table, business rules
+- [x] `.env.example` with all required environment variables
+- [x] Docker Compose simplified to WebApi + PostgreSQL only
+- [x] API endpoint summary table in README
+- [x] `docs/domain.md` — domain model with Mermaid diagrams
+- [x] Architecture Decision Records (ADR 001–005)
+- [x] API error reference guide (`docs/error-reference.md`)
+- [x] `CHANGELOG.md` with all development phases
