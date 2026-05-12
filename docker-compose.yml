@@ -11,7 +11,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ConnectionStrings__DefaultConnection=Host=ambev.developerevaluation.database;Port=5432;Database=developer_evaluation;Username=developer;Password=ev@luAt10n
-      - ConnectionStrings__RabbitMq=amqp://developer:ev@luAt10n@ambev.developerevaluation.rabbitmq:5672
+      - ConnectionStrings__RabbitMq=amqp://developer:ev%40luAt10n@ambev.developerevaluation.rabbitmq:5672
     ports:
       - "8080:8080"
     depends_on:
