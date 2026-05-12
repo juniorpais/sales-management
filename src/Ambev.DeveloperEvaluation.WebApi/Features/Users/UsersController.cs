@@ -38,13 +38,16 @@ public class UsersController : BaseController
             return BadRequest(validationResult.Errors.First().ErrorMessage);
 
         var command = _mapper.Map<CreateUserCommand>(request);
-        var response = await _mediator.Send(command, cancellationToken);
+        var result = await _mediator.Send(command, cancellationToken);
+
+        if (result.IsFailed)
+            return HandleResult(result);
 
         return Created(string.Empty, new { }, new ApiResponseWithData<CreateUserResponse>
         {
             Success = true,
             Message = "User created successfully",
-            Data = _mapper.Map<CreateUserResponse>(response)
+            Data = _mapper.Map<CreateUserResponse>(result.Value)
         });
     }
 
@@ -60,13 +63,16 @@ public class UsersController : BaseController
             return BadRequest(validationResult.Errors.First().ErrorMessage);
 
         var command = _mapper.Map<GetUserCommand>(request.Id);
-        var response = await _mediator.Send(command, cancellationToken);
+        var result = await _mediator.Send(command, cancellationToken);
+
+        if (result.IsFailed)
+            return HandleResult(result);
 
         return Ok(new ApiResponseWithData<GetUserResponse>
         {
             Success = true,
             Message = "User retrieved successfully",
-            Data = _mapper.Map<GetUserResponse>(response)
+            Data = _mapper.Map<GetUserResponse>(result.Value)
         });
     }
 
@@ -101,7 +107,10 @@ public class UsersController : BaseController
             return BadRequest(validationResult.Errors.First().ErrorMessage);
 
         var command = _mapper.Map<DeleteUserCommand>(request.Id);
-        await _mediator.Send(command, cancellationToken);
+        var result = await _mediator.Send(command, cancellationToken);
+
+        if (result.IsFailed)
+            return HandleResult(result);
 
         return Ok(new ApiResponse { Success = true, Message = "User deleted successfully" });
     }
