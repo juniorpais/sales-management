@@ -35,7 +35,7 @@ Sales Management API for the DeveloperStore team. Handles complete sales records
 | Mapping | AutoMapper 13 |
 | Validation | FluentValidation 11 |
 | Results | FluentResults 3 |
-| Events | IEventPublisher + Polly (retry) |
+| Events | Rebus + RabbitMQ + Polly (retry) |
 | Logging | Serilog |
 | Tests | xUnit + NSubstitute + Bogus + FluentAssertions |
 
@@ -59,11 +59,13 @@ git clone https://github.com/juniorpais/sales-management.git
 cd sales-management
 ```
 
-**2. Start the database**
+**2. Start the infrastructure**
 
 ```bash
-docker-compose up -d ambev.developerevaluation.database
+docker-compose up -d ambev.developerevaluation.database ambev.developerevaluation.rabbitmq
 ```
+
+> RabbitMQ management UI: `http://localhost:15672` (user: `developer` / pass: `ev@luAt10n`)
 
 **3. Apply migrations**
 
@@ -94,7 +96,7 @@ The API will be available at:
 docker-compose up --build
 ```
 
-This starts both the PostgreSQL database and the WebApi container. The API will be available at `http://localhost:8080`.
+This starts PostgreSQL, RabbitMQ, and the WebApi container. The API will be available at `http://localhost:8080`.
 
 ---
 
@@ -217,7 +219,7 @@ Quantity-based discount tiers applied automatically per item:
 │   ├── Ambev.DeveloperEvaluation.Domain/        # Entities, business rules, events, interfaces
 │   ├── Ambev.DeveloperEvaluation.Application/   # CQRS handlers, validators, AutoMapper profiles
 │   ├── Ambev.DeveloperEvaluation.ORM/           # EF Core mappings, repositories, migrations
-│   ├── Ambev.DeveloperEvaluation.IoC/           # Dependency injection, LogEventPublisher
+│   ├── Ambev.DeveloperEvaluation.IoC/           # Dependency injection, RebusEventPublisher
 │   ├── Ambev.DeveloperEvaluation.Common/        # Shared abstractions (IEventPublisher, IDomainEvent)
 │   └── Ambev.DeveloperEvaluation.WebApi/        # Controllers, middleware, request/response models
 ├── tests/
