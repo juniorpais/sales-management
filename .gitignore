@@ -373,3 +373,4 @@ FodyWeavers.xsd
 !.env.example
 .vscode/tasks.json
 .vscode/launch.json
+.vscode/settings.json
