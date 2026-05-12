@@ -5,17 +5,18 @@
 | Phase | Description | Branch | Status | Progress |
 |-------|-------------|--------|--------|----------|
 | 1 | Project Setup | `main` | ✅ Done | 100% |
-| 2 | Database + ORM Mapping | `feature/database-orm` | ✅ Done* | 100% |
-| 3 | Data Manipulation Layer | `feature/data-manipulation` | ✅ Done* | 100% |
-| 4 | Services Layer (Rebus) | `feature/services-layer` | ⬜ Pending | 0% |
-| 5 | Business Rules | `feature/business-rules` | ✅ Done* | 100% |
-| 6 | Application Log | `feature/app-logging` | ⬜ Pending | 0% |
-| 7 | Tests | `feature/tests` | ⬜ Pending | 0% |
-| 8 | Documentation | `feature/documentation` | ⬜ Pending | 0% |
+| 2 | Database + ORM Mapping | `feature/database-orm` | ✅ Done | 100% |
+| 3 | Data Manipulation Layer | `feature/data-manipulation` | ✅ Done | 100% |
+| 4 | Services Layer | `feature/database-orm` | ✅ Done | 100% |
+| 5 | Business Rules | `feature/business-rules` | ✅ Done | 100% |
+| 6 | API Layer | `feature/api-layer` | ✅ Done | 100% |
+| 7 | Application Log | `feature/app-logging` | ⬜ Pending | 0% |
+| 8 | Tests | `feature/tests` | ⬜ Pending | 0% |
+| 9 | Documentation | `feature/documentation` | ⬜ Pending | 0% |
 
 > *Phases 2, 3 and 5 were developed together under `feature/domain-layer` and `feature/application-layer` following a DDD-first approach. The branch names above reflect the commit segregation convention from the challenge manual.
 
-**Overall Progress: 55% (44 / 80 tasks completed)**
+**Overall Progress: 78% (62 / 80 tasks completed)**
 
 ---
 
@@ -121,20 +122,39 @@ style:    formatting, no logic change
 
 ---
 
-## Phase 4 — Services Layer `feature/services-layer`
+## Phase 4 — Services Layer `feature/database-orm`
 
-**Progress: 0% (0/8)**
+**Progress: 100% (8/8)**
 
-> Rebus for event publishing. Polly for retry. Serilog structured logging.
+> Polly for retry. Serilog structured logging. IEventPublisher abstraction.
 
-- [ ] Add Rebus package to Infrastructure project
-- [ ] `LogEventPublisher` — implements `IEventPublisher` via Serilog + Polly retry (3x exponential backoff)
-- [ ] Register `IEventPublisher` in IoC (`InfrastructureModuleInitializer`)
-- [ ] `SaleCreatedEvent` published on sale creation
-- [ ] `SaleModifiedEvent` published on sale update
-- [ ] `SaleCancelledEvent` published on sale cancellation
-- [ ] `ItemCancelledEvent` published on item cancellation
-- [ ] Validate Polly retry: log warning on each retry, error on final failure
+- [x] Add Polly package to IoC project
+- [x] `LogEventPublisher` — implements `IEventPublisher` via Serilog + Polly retry (3x exponential backoff)
+- [x] Register `IEventPublisher` in IoC (`InfrastructureModuleInitializer`)
+- [x] `SaleCreatedEvent` published on sale creation
+- [x] `SaleModifiedEvent` published on sale update
+- [x] `SaleCancelledEvent` published on sale cancellation
+- [x] `ItemCancelledEvent` published on item cancellation
+- [x] Polly retry: log warning on each retry, error on final failure
+
+---
+
+## Phase 6 — API Layer `feature/api-layer`
+
+**Progress: 100% (10/10)**
+
+> RESTful controllers. AutoMapper request/response profiles. FluentResults mapped to HTTP status codes.
+
+- [x] `BaseController` with `HandleResult<T>` helper for FluentResults
+- [x] `SalesController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}
+- [x] `ProductsController` — POST, GET/{id}, GET (paginated), GET/categories, GET/category/{category}, PUT/{id}, DELETE/{id}
+- [x] `CartsController` — POST, GET/{id}, GET (paginated), PUT/{id}, DELETE/{id}
+- [x] `UsersController` — complete with GET (paginated) and PUT/{id}
+- [x] Request/Response models for all resources
+- [x] AutoMapper profiles for all Request → Command mappings
+- [x] `JsonStringEnumConverter` — enums accepted as strings in JSON
+- [x] PostgreSQL connection string aligned with Docker Compose
+- [x] Postman collection in `docs/`
 
 ---
 
@@ -159,7 +179,7 @@ style:    formatting, no logic change
 
 ---
 
-## Phase 6 — Application Log `feature/app-logging`
+## Phase 7 — Application Log `feature/app-logging`
 
 **Progress: 0% (0/5)**
 
@@ -173,7 +193,7 @@ style:    formatting, no logic change
 
 ---
 
-## Phase 7 — Tests `feature/tests`
+## Phase 8 — Tests `feature/tests`
 
 **Progress: 0% (0/8)**
 
@@ -187,12 +207,12 @@ style:    formatting, no logic change
 - [ ] Unit tests — `CancelSaleHandler` (success + not found + already cancelled)
 - [ ] Integration tests setup — `WebApplicationFactory` + real PostgreSQL
 - [ ] Coverage report configured (`coverlet` + `coverage-report.sh`)
-- [ ] Postman collection with all endpoints (saved in `docs/`)
+- [x] Postman collection with all endpoints (saved in `docs/`)
 - [ ] Manual CRUD test scenarios documented in `docs/`
 
 ---
 
-## Phase 8 — Documentation `feature/documentation`
+## Phase 9 — Documentation `feature/documentation`
 
 **Progress: 0% (0/5)**
 
