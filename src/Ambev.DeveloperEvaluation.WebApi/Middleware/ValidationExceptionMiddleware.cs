@@ -32,6 +32,16 @@ public class ValidationExceptionMiddleware
 
             await HandleValidationExceptionAsync(context, ex);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(
+                "Conflict for {Method} {Path}: {Message}",
+                context.Request.Method,
+                context.Request.Path,
+                ex.Message);
+
+            await HandleConflictExceptionAsync(context, ex);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex,
@@ -39,7 +49,7 @@ public class ValidationExceptionMiddleware
                 context.Request.Method,
                 context.Request.Path);
 
-            throw;
+            await HandleInternalErrorAsync(context);
         }
     }
 
@@ -55,11 +65,39 @@ public class ValidationExceptionMiddleware
             Errors = exception.Errors.Select(error => (ValidationErrorDetail)error)
         };
 
-        var jsonOptions = new JsonSerializerOptions
+        return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
+    }
+
+    private static Task HandleConflictExceptionAsync(HttpContext context, InvalidOperationException exception)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = StatusCodes.Status409Conflict;
+
+        var response = new ApiResponse
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            Success = false,
+            Message = exception.Message
         };
 
-        return context.Response.WriteAsync(JsonSerializer.Serialize(response, jsonOptions));
+        return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
     }
+
+    private static Task HandleInternalErrorAsync(HttpContext context)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        var response = new ApiResponse
+        {
+            Success = false,
+            Message = "An unexpected error occurred."
+        };
+
+        return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
+    }
+
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 }
