@@ -45,6 +45,7 @@ Sales Management API for the DeveloperStore team. Handles complete sales records
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8)
 - [Docker](https://www.docker.com/get-started) + Docker Compose
+- [EF Core CLI tools](https://learn.microsoft.com/en-us/ef/core/cli/dotnet): `dotnet tool install --global dotnet-ef`
 - [Postman](https://www.postman.com/) (optional — for manual testing)
 
 ---
@@ -67,21 +68,15 @@ docker-compose up -d ambev.developerevaluation.database
 **3. Apply migrations**
 
 ```bash
-DOTNET_ROLL_FORWARD=Major dotnet ef database update \
+dotnet ef database update \
   --project src/Ambev.DeveloperEvaluation.ORM \
   --startup-project src/Ambev.DeveloperEvaluation.WebApi \
   --context DefaultContext
 ```
 
-**4. Configure environment variables** (optional — defaults work with Docker Compose)
+> **Note:** If you have .NET 9+ installed alongside .NET 8, prefix the command with `DOTNET_ROLL_FORWARD=Major`.
 
-```bash
-cp .env.example .env
-```
-
----
-
-## Running the API
+**4. Run the API**
 
 ```bash
 dotnet run --project src/Ambev.DeveloperEvaluation.WebApi
@@ -90,6 +85,16 @@ dotnet run --project src/Ambev.DeveloperEvaluation.WebApi
 The API will be available at:
 - HTTP: `http://localhost:5119`
 - Swagger UI: `http://localhost:5119/swagger`
+
+---
+
+### Alternative — Run everything with Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+This starts both the PostgreSQL database and the WebApi container. The API will be available at `http://localhost:8080`.
 
 ---
 
@@ -122,7 +127,11 @@ DOTNET_ROLL_FORWARD=Major dotnet test Ambev.DeveloperEvaluation.sln
 **Coverage report**
 
 ```bash
+# Linux/Windows
 bash coverage-report.sh
+
+# macOS
+bash coverage-report-macos.sh
 ```
 
 ---
@@ -230,7 +239,7 @@ Quantity-based discount tiers applied automatically per item:
 
 - [Domain Model & Architecture](docs/domain.md)
 - [API General Definitions](docs/general-api.md)
-- [Sales API](docs/carts-api.md)
+- [Sales API](docs/general-api.md)
 - [Products API](docs/products-api.md)
 - [Carts API](docs/carts-api.md)
 - [Users API](docs/users-api.md)
