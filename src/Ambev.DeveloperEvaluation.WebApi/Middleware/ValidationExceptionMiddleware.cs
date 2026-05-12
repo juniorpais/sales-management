@@ -32,6 +32,16 @@ public class ValidationExceptionMiddleware
 
             await HandleValidationExceptionAsync(context, ex);
         }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(
+                "Not found for {Method} {Path}: {Message}",
+                context.Request.Method,
+                context.Request.Path,
+                ex.Message);
+
+            await HandleNotFoundExceptionAsync(context, ex);
+        }
         catch (InvalidOperationException ex)
         {
             _logger.LogWarning(
@@ -63,6 +73,20 @@ public class ValidationExceptionMiddleware
             Success = false,
             Message = "Validation Failed",
             Errors = exception.Errors.Select(error => (ValidationErrorDetail)error)
+        };
+
+        return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
+    }
+
+    private static Task HandleNotFoundExceptionAsync(HttpContext context, KeyNotFoundException exception)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+
+        var response = new ApiResponse
+        {
+            Success = false,
+            Message = exception.Message
         };
 
         return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
