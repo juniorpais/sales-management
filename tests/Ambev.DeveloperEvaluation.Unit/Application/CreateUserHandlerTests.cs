@@ -68,8 +68,8 @@ public class CreateUserHandlerTests
         var createUserResult = await _handler.Handle(command, CancellationToken.None);
 
         // Then
-        createUserResult.Should().NotBeNull();
-        createUserResult.Id.Should().Be(user.Id);
+        createUserResult.IsSuccess.Should().BeTrue();
+        createUserResult.Value.Id.Should().Be(user.Id);
         await _userRepository.Received(1).CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
     }
 

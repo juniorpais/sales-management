@@ -1,3 +1,4 @@
+using FluentResults;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Users.GetUser;
@@ -5,7 +6,7 @@ namespace Ambev.DeveloperEvaluation.Application.Users.GetUser;
 /// <summary>
 /// Command for retrieving a user by their ID
 /// </summary>
-public record GetUserCommand : IRequest<GetUserResult>
+public record GetUserCommand : IRequest<Result<GetUserResult>>
 {
     /// <summary>
     /// The unique identifier of the user to retrieve

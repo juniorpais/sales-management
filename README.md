@@ -92,11 +92,32 @@ The API will be available at:
 
 ### Alternative — Run everything with Docker Compose
 
+If you prefer not to install .NET SDK locally, you can run the full stack with Docker:
+
+**1. Build and start all services**
+
 ```bash
 docker-compose up --build
 ```
 
-This starts PostgreSQL, RabbitMQ, and the WebApi container. The API will be available at `http://localhost:8080`.
+This starts PostgreSQL, RabbitMQ, and the WebApi container.
+
+**2. Apply migrations** *(first run only)*
+
+```bash
+docker exec -it ambev_developer_evaluation_webapi \
+  dotnet ef database update \
+  --project src/Ambev.DeveloperEvaluation.ORM \
+  --startup-project src/Ambev.DeveloperEvaluation.WebApi \
+  --context DefaultContext
+```
+
+> Alternatively, the API applies pending migrations automatically on startup if `EnsureCreated` is configured.
+
+**3. Access the API**
+
+- Swagger UI: `http://localhost:8080/swagger`
+- RabbitMQ Management: `http://localhost:15672` (user: `developer` / pass: `ev@luAt10n`)
 
 ---
 
